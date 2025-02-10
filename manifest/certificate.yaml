@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: github-activity
+  namespace: github-activity
+spec:
+  secretName: github-activity
+  issuerRef:
+    name: acme-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - "github-activity.trueberryless.org"
