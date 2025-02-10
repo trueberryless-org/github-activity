@@ -17,5 +17,5 @@ spec:
     spec:
       containers:
         - name: github-activity
-          image: "trueberryless/github-activity"
+          image: "trueberryless/github-activity:0.1.0"
           imagePullPolicy: Always
