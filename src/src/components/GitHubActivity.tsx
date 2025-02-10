@@ -25,7 +25,10 @@ interface GitHubActivityProps {
 
 const CACHE_EXPIRATION_MS = 5 * 60 * 1000; // 5 Minuten Cache-Gültigkeit
 
-const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN }) => {
+const GitHubActivity: React.FC<GitHubActivityProps> = ({
+  username,
+  GITHUB_TOKEN,
+}) => {
   const [events, setEvents] = useState<GitHubEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -56,11 +59,17 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
   };
 
   const saveCache = (data: GitHubEvent[]) => {
-    localStorage.setItem(cacheKey, JSON.stringify({ events: data, timestamp: Date.now() }));
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({ events: data, timestamp: Date.now() })
+    );
   };
 
   const saveRateCache = (rate: GitHubRateLimit) => {
-    localStorage.setItem(cacheRateKey, JSON.stringify({ rateLimit: rate, timestamp: Date.now() }));
+    localStorage.setItem(
+      cacheRateKey,
+      JSON.stringify({ rateLimit: rate, timestamp: Date.now() })
+    );
   };
 
   const fetchRateLimit = async () => {
@@ -90,11 +99,14 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
 
   const fetchEvents = async (pageNum: number) => {
     try {
-      const response = await fetch(`https://api.github.com/users/${username}/events?per_page=30&page=${pageNum}`, {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN.githubToken}`,
-        },
-      });
+      const response = await fetch(
+        `https://api.github.com/users/${username}/events?per_page=30&page=${pageNum}`,
+        {
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN.githubToken}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to fetch GitHub events");
 
@@ -102,7 +114,12 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
 
       // 🔥 Duplikate entfernen, indem wir nur Events mit neuer ID hinzufügen
       setEvents((prevEvents) => {
-        const uniqueEvents = [...prevEvents, ...newData.filter((event) => !prevEvents.some((e) => e.id === event.id))];
+        const uniqueEvents = [
+          ...prevEvents,
+          ...newData.filter(
+            (event) => !prevEvents.some((e) => e.id === event.id)
+          ),
+        ];
         saveCache(uniqueEvents);
         return uniqueEvents;
       });
@@ -169,7 +186,9 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
               onClick={loadMore}
               disabled={!canLoadMore}
               className={`w-full font-bold py-2 px-4 rounded ${
-                canLoadMore ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-gray-500 text-gray-300 cursor-not-allowed"
+                canLoadMore
+                  ? "bg-blue-500 hover:bg-blue-600 text-white"
+                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
               }`}
             >
               {canLoadMore ? "Load more" : "Rate limit exceeded"}
@@ -177,7 +196,9 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
           )}
         </>
       ) : (
-        <p className="text-gray-400 text-center">No recent GitHub activity found.</p>
+        <p className="text-gray-400 text-center">
+          No recent GitHub activity found.
+        </p>
       )}
     </div>
   );

@@ -8,7 +8,9 @@ export default function CommitListPage(githubToken: any) {
   return (
     <div className="flex flex-col items-center gap-6 p-6">
       <GitHubUserInput onUserSelect={(user) => setUsername(user)} />
-      <h3 className="w-full text-2xl font-bold text-white">Showing latest GitHub activity for {username}</h3>
+      <h3 className="w-full text-2xl font-bold text-white">
+        Showing latest GitHub activity for {username}
+      </h3>
       <GitHubActivity username={username} GITHUB_TOKEN={githubToken} />
     </div>
   );
