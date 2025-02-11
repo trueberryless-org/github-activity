@@ -60,7 +60,12 @@ function reducer(state: State, action: Action): State {
     case "ADD_EVENTS":
       return {
         ...state,
-        events: [...state.events, ...action.newEvents.filter((event) => !state.events.some((e) => e.id === event.id))],
+        events: [
+          ...state.events,
+          ...action.newEvents.filter(
+            (event) => !state.events.some((e) => e.id === event.id)
+          ),
+        ],
       };
     case "SET_LOADING":
       return { ...state, loading: action.loading };
@@ -79,7 +84,10 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN }) => {
+const GitHubActivity: React.FC<GitHubActivityProps> = ({
+  username,
+  GITHUB_TOKEN,
+}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const cacheKey = useMemo(() => `github_events_${username}`, [username]);
@@ -110,9 +118,12 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
 
   const fetchEvents = async (pageNum: number) => {
     try {
-      const response = await fetch(`https://api.github.com/users/${username}/events?per_page=30&page=${pageNum}`, {
-        headers: { Authorization: `token ${GITHUB_TOKEN.githubToken}` },
-      });
+      const response = await fetch(
+        `https://api.github.com/users/${username}/events?per_page=30&page=${pageNum}`,
+        {
+          headers: { Authorization: `token ${GITHUB_TOKEN.githubToken}` },
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to fetch GitHub events");
 
@@ -120,10 +131,21 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
       dispatch({ type: "ADD_EVENTS", newEvents: newData });
 
       if (pageNum === 1) {
-        localStorage.setItem(cacheKey, JSON.stringify({ events: newData, timestamp: Date.now() }));
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({ events: newData, timestamp: Date.now() })
+        );
       } else {
-        const existingCache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
-        localStorage.setItem(cacheKey, JSON.stringify({ events: [...(existingCache.events || []), ...newData], timestamp: Date.now() }));
+        const existingCache = JSON.parse(
+          localStorage.getItem(cacheKey) || "{}"
+        );
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            events: [...(existingCache.events || []), ...newData],
+            timestamp: Date.now(),
+          })
+        );
       }
 
       dispatch({ type: "SET_HAS_MORE", hasMore: newData.length === 30 });
@@ -146,7 +168,10 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
       const coreLimit = data.rate || data.rate_limit?.core;
 
       dispatch({ type: "SET_RATE_LIMIT", rateLimit: coreLimit });
-      dispatch({ type: "SET_CAN_LOAD_MORE", canLoadMore: coreLimit.remaining / coreLimit.limit >= 0.5 });
+      dispatch({
+        type: "SET_CAN_LOAD_MORE",
+        canLoadMore: coreLimit.remaining / coreLimit.limit >= 0.5,
+      });
     } catch (error) {
       console.error("Failed to fetch rate limit:", error);
     }
@@ -188,7 +213,9 @@ const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN 
           )}
         </>
       ) : (
-        <p className="text-gray-400 text-center">No recent GitHub activity found.</p>
+        <p className="text-gray-400 text-center">
+          No recent GitHub activity found.
+        </p>
       )}
     </div>
   );
