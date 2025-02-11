@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useReducer, useEffect, useMemo } from "react";
 import CommitCard from "./Cards/CommitCard";
 import PullRequestCard from "./Cards/PullRequestCard";
 import IssueCard from "./Cards/IssueCard";
 import ForkCard from "./Cards/ForkCard";
 import WatchCard from "./Cards/WatchCard";
+
+const CACHE_EXPIRATION_MS = 60 * 60 * 1000; // 60 minutes
 
 interface GitHubEvent {
   id: string;
@@ -23,182 +25,170 @@ interface GitHubActivityProps {
   GITHUB_TOKEN: { githubToken: string };
 }
 
-const CACHE_EXPIRATION_MS = 5 * 60 * 1000; // 5 Minuten Cache-Gültigkeit
+type State = {
+  events: GitHubEvent[];
+  loading: boolean;
+  page: number;
+  hasMore: boolean;
+  rateLimit: GitHubRateLimit | null;
+  canLoadMore: boolean;
+};
 
-const GitHubActivity: React.FC<GitHubActivityProps> = ({
-  username,
-  GITHUB_TOKEN,
-}) => {
-  const [events, setEvents] = useState<GitHubEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [rateLimit, setRateLimit] = useState<GitHubRateLimit | null>(null);
-  const [canLoadMore, setCanLoadMore] = useState(true);
+type Action =
+  | { type: "SET_EVENTS"; events: GitHubEvent[] }
+  | { type: "ADD_EVENTS"; newEvents: GitHubEvent[] }
+  | { type: "SET_LOADING"; loading: boolean }
+  | { type: "SET_PAGE"; page: number }
+  | { type: "SET_HAS_MORE"; hasMore: boolean }
+  | { type: "SET_RATE_LIMIT"; rateLimit: GitHubRateLimit }
+  | { type: "SET_CAN_LOAD_MORE"; canLoadMore: boolean }
+  | { type: "RESET" };
 
-  const cacheKey = `github_events_${username}`;
-  const cacheRateKey = `github_rate_limit`;
+const initialState: State = {
+  events: [],
+  loading: true,
+  page: 1,
+  hasMore: true,
+  rateLimit: null,
+  canLoadMore: true,
+};
 
-  const loadCache = () => {
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "SET_EVENTS":
+      return { ...state, events: action.events };
+    case "ADD_EVENTS":
+      return {
+        ...state,
+        events: [...state.events, ...action.newEvents.filter((event) => !state.events.some((e) => e.id === event.id))],
+      };
+    case "SET_LOADING":
+      return { ...state, loading: action.loading };
+    case "SET_PAGE":
+      return { ...state, page: action.page };
+    case "SET_HAS_MORE":
+      return { ...state, hasMore: action.hasMore };
+    case "SET_RATE_LIMIT":
+      return { ...state, rateLimit: action.rateLimit };
+    case "SET_CAN_LOAD_MORE":
+      return { ...state, canLoadMore: action.canLoadMore };
+    case "RESET":
+      return initialState;
+    default:
+      return state;
+  }
+}
+
+const GitHubActivity: React.FC<GitHubActivityProps> = ({ username, GITHUB_TOKEN }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const cacheKey = useMemo(() => `github_events_${username}`, [username]);
+
+  useEffect(() => {
+    dispatch({ type: "RESET" }); // Reset state when username changes
+
     const cachedData = localStorage.getItem(cacheKey);
-    const cachedRateLimit = localStorage.getItem(cacheRateKey);
     if (cachedData) {
       const { events, timestamp } = JSON.parse(cachedData);
       if (Date.now() - timestamp < CACHE_EXPIRATION_MS) {
-        setEvents(events);
-        setLoading(false);
+        dispatch({ type: "SET_EVENTS", events });
+        dispatch({ type: "SET_LOADING", loading: false });
+
+        // Determine the correct page based on the number of cached events
+        const cachedPage = Math.ceil(events.length / 30);
+        dispatch({ type: "SET_PAGE", page: cachedPage });
+
+        fetchRateLimit();
+
+        return; // No need to fetch since cache is valid
       }
     }
-    if (cachedRateLimit) {
-      const { rateLimit, timestamp } = JSON.parse(cachedRateLimit);
-      if (Date.now() - timestamp < CACHE_EXPIRATION_MS) {
-        setRateLimit(rateLimit);
-        setCanLoadMore(rateLimit.remaining / rateLimit.limit >= 0.5);
+
+    fetchEvents(1); // Fetch if no cache or cache is expired
+    fetchRateLimit();
+  }, [username]);
+
+  const fetchEvents = async (pageNum: number) => {
+    try {
+      const response = await fetch(`https://api.github.com/users/${username}/events?per_page=30&page=${pageNum}`, {
+        headers: { Authorization: `token ${GITHUB_TOKEN.githubToken}` },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch GitHub events");
+
+      const newData: GitHubEvent[] = await response.json();
+      dispatch({ type: "ADD_EVENTS", newEvents: newData });
+
+      if (pageNum === 1) {
+        localStorage.setItem(cacheKey, JSON.stringify({ events: newData, timestamp: Date.now() }));
+      } else {
+        const existingCache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
+        localStorage.setItem(cacheKey, JSON.stringify({ events: [...(existingCache.events || []), ...newData], timestamp: Date.now() }));
       }
+
+      dispatch({ type: "SET_HAS_MORE", hasMore: newData.length === 30 });
+      fetchRateLimit();
+    } catch (error) {
+      console.error("Failed to fetch GitHub events:", error);
+    } finally {
+      dispatch({ type: "SET_LOADING", loading: false });
     }
-  };
-
-  const saveCache = (data: GitHubEvent[]) => {
-    localStorage.setItem(
-      cacheKey,
-      JSON.stringify({ events: data, timestamp: Date.now() })
-    );
-  };
-
-  const saveRateCache = (rate: GitHubRateLimit) => {
-    localStorage.setItem(
-      cacheRateKey,
-      JSON.stringify({ rateLimit: rate, timestamp: Date.now() })
-    );
   };
 
   const fetchRateLimit = async () => {
     try {
       const response = await fetch("https://api.github.com/rate_limit", {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN.githubToken}`,
-        },
+        headers: { Authorization: `token ${GITHUB_TOKEN.githubToken}` },
       });
-
       if (!response.ok) throw new Error("Failed to fetch rate limit");
 
       const data = await response.json();
       const coreLimit = data.rate || data.rate_limit?.core;
-      setRateLimit(coreLimit);
-      saveRateCache(coreLimit);
 
-      if (coreLimit.remaining / coreLimit.limit < 0.5) {
-        setCanLoadMore(false);
-      } else {
-        setCanLoadMore(true);
-      }
+      dispatch({ type: "SET_RATE_LIMIT", rateLimit: coreLimit });
+      dispatch({ type: "SET_CAN_LOAD_MORE", canLoadMore: coreLimit.remaining / coreLimit.limit >= 0.5 });
     } catch (error) {
       console.error("Failed to fetch rate limit:", error);
     }
   };
 
-  const fetchEvents = async (pageNum: number) => {
-    try {
-      const response = await fetch(
-        `https://api.github.com/users/${username}/events?per_page=30&page=${pageNum}`,
-        {
-          headers: {
-            Authorization: `token ${GITHUB_TOKEN.githubToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch GitHub events");
-
-      const newData: GitHubEvent[] = await response.json();
-
-      // 🔥 Duplikate entfernen, indem wir nur Events mit neuer ID hinzufügen
-      setEvents((prevEvents) => {
-        const uniqueEvents = [
-          ...prevEvents,
-          ...newData.filter(
-            (event) => !prevEvents.some((e) => e.id === event.id)
-          ),
-        ];
-        saveCache(uniqueEvents);
-        return uniqueEvents;
-      });
-
-      if (newData.length < 30) setHasMore(false);
-
-      await fetchRateLimit();
-    } catch (error) {
-      console.error("Failed to fetch GitHub events:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setEvents([]);
-    setPage(1);
-    setHasMore(true);
-    setLoading(true);
-    loadCache();
-    fetchEvents(1);
-    fetchRateLimit();
-  }, [username]);
-
   const loadMore = () => {
-    if (!hasMore || !canLoadMore) return;
-    const nextPage = page + 1;
-    setPage(nextPage);
+    if (!state.hasMore || !state.canLoadMore) return;
+    const nextPage = state.page + 1;
+    dispatch({ type: "SET_PAGE", page: nextPage });
     fetchEvents(nextPage);
   };
 
   return (
     <div className="w-full space-y-6">
-      {loading && events.length === 0 ? (
+      {state.loading && state.events.length === 0 ? (
         <p className="text-gray-400 text-center">Loading GitHub activity...</p>
-      ) : events.length > 0 ? (
+      ) : state.events.length > 0 ? (
         <>
-          {events.map((event) => {
-            const EventCard = (() => {
-              switch (event.type) {
-                case "PushEvent":
-                  return CommitCard;
-                case "PullRequestEvent":
-                  return PullRequestCard;
-                case "IssuesEvent":
-                  return IssueCard;
-                case "ForkEvent":
-                  return ForkCard;
-                case "WatchEvent":
-                  return WatchCard;
-                default:
-                  return null;
-              }
-            })();
+          {state.events.map((event) => {
+            const EventCard =
+              {
+                PushEvent: CommitCard,
+                PullRequestEvent: PullRequestCard,
+                IssuesEvent: IssueCard,
+                ForkEvent: ForkCard,
+                WatchEvent: WatchCard,
+              }[event.type] || null;
 
-            return EventCard ? (
-              <div key={event.id}>
-                <EventCard {...event} />
-              </div>
-            ) : null;
+            return EventCard ? <EventCard key={event.id} {...event} /> : null;
           })}
-          {hasMore && (
+          {state.hasMore && (
             <button
               onClick={loadMore}
-              disabled={!canLoadMore}
-              className={`w-full font-bold py-2 px-4 rounded ${
-                canLoadMore
-                  ? "bg-blue-500 hover:bg-blue-600 text-white"
-                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
-              }`}
+              disabled={!state.canLoadMore}
+              className="w-full font-bold py-2 px-4 rounded bg-blue-500 hover:bg-blue-600 text-white"
             >
-              {canLoadMore ? "Load more" : "Rate limit exceeded"}
+              {state.canLoadMore ? "Load more" : "Rate limit exceeded"}
             </button>
           )}
         </>
       ) : (
-        <p className="text-gray-400 text-center">
-          No recent GitHub activity found.
-        </p>
+        <p className="text-gray-400 text-center">No recent GitHub activity found.</p>
       )}
     </div>
   );
