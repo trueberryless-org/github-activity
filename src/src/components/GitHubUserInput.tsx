@@ -2,16 +2,13 @@ import React, { useState, useEffect } from "react";
 
 interface GitHubUserInputProps {
   onUserSelect: (username: string) => void;
+  GITHUB_TOKEN: { githubToken: string };
 }
 
-const GitHubUserInput: React.FC<GitHubUserInputProps> = ({ onUserSelect }) => {
+const GitHubUserInput: React.FC<GitHubUserInputProps> = ({ onUserSelect, GITHUB_TOKEN }) => {
   const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<
-    { login: string; avatar_url: string }[]
-  >([]);
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
+  const [suggestions, setSuggestions] = useState<{ login: string; avatar_url: string }[]>([]);
+  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const fetchUserSuggestions = async (input: string) => {
     if (!input) {
@@ -20,9 +17,9 @@ const GitHubUserInput: React.FC<GitHubUserInputProps> = ({ onUserSelect }) => {
     }
 
     try {
-      const response = await fetch(
-        `https://api.github.com/search/users?q=${input}&per_page=5`
-      );
+      const response = await fetch(`https://api.github.com/search/users?q=${input}&per_page=5`, {
+        headers: { Authorization: `token ${GITHUB_TOKEN.githubToken}` },
+      });
       const data = await response.json();
       setSuggestions(data.items || []);
     } catch (error) {
@@ -77,11 +74,7 @@ const GitHubUserInput: React.FC<GitHubUserInputProps> = ({ onUserSelect }) => {
               className="flex items-center gap-3 p-3 hover:bg-gray-800 cursor-pointer"
               onClick={() => handleSelectUser(user.login)}
             >
-              <img
-                src={user.avatar_url}
-                alt={user.login}
-                className="w-8 h-8 rounded-full border border-gray-600"
-              />
+              <img src={user.avatar_url} alt={user.login} className="w-8 h-8 rounded-full border border-gray-600" />
               <span className="text-white">{user.login}</span>
             </li>
           ))}

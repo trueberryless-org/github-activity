@@ -3,6 +3,7 @@ import "../styles/global.css";
 import PageWrapper from "../components/PageWrapper";
 
 const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
+const username = Astro.params.username ?? "trueberryless";
 ---
 
 <html lang="en">
@@ -24,7 +25,7 @@ const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
 	</head>
 	<body class="bg-gray-950">
 		<main>
-      <PageWrapper client:load githubToken={GITHUB_TOKEN} username="trueberryless" />
+      <PageWrapper client:load githubToken={GITHUB_TOKEN} username={username} />
 		</main>
 	</body>
 </html>
