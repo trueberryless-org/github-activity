@@ -2,9 +2,13 @@ import React, { useState, useEffect } from "react";
 
 interface GitHubUserInputProps {
   onUserSelect: (username: string) => void;
+  GITHUB_TOKEN: { githubToken: string };
 }
 
-const GitHubUserInput: React.FC<GitHubUserInputProps> = ({ onUserSelect }) => {
+const GitHubUserInput: React.FC<GitHubUserInputProps> = ({
+  onUserSelect,
+  GITHUB_TOKEN,
+}) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<
     { login: string; avatar_url: string }[]
@@ -21,7 +25,10 @@ const GitHubUserInput: React.FC<GitHubUserInputProps> = ({ onUserSelect }) => {
 
     try {
       const response = await fetch(
-        `https://api.github.com/search/users?q=${input}&per_page=5`
+        `https://api.github.com/search/users?q=${input}&per_page=5`,
+        {
+          headers: { Authorization: `token ${GITHUB_TOKEN.githubToken}` },
+        }
       );
       const data = await response.json();
       setSuggestions(data.items || []);
