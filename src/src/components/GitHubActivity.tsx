@@ -1,8 +1,9 @@
-import { useReducer, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useReducer } from "react";
+
 import CommitCard from "./Cards/CommitCard";
-import PullRequestCard from "./Cards/PullRequestCard";
-import IssueCard from "./Cards/IssueCard";
 import ForkCard from "./Cards/ForkCard";
+import IssueCard from "./Cards/IssueCard";
+import PullRequestCard from "./Cards/PullRequestCard";
 import WatchCard from "./Cards/WatchCard";
 
 const CACHE_EXPIRATION_MS = 60 * 60 * 1000; // 60 minutes
