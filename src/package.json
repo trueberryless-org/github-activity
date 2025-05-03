@@ -22,5 +22,5 @@
     "postcss": "^8.5.1",
     "tailwindcss": "^4.0.5"
   },
-  "packageManager": "pnpm@9.6.0"
+  "packageManager": "pnpm@10.10.0"
 }
