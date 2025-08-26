@@ -9,7 +9,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/react": "^4.2.7",
+    "@astrojs/react": "^4.3.0",
     "@tailwindcss/vite": "^4.0.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
