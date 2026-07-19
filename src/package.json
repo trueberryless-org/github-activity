@@ -1,7 +1,7 @@
 {
   "name": "github-activity",
   "version": "0.1.1",
-  "homepage": "https://github-activity.trueberryless.org",
+  "homepage": "https://recent-github-activity.netlify.app/",
   "bugs": {
     "url": "https://github.com/trueberryless-org/github-activity/issues"
   },
@@ -10,7 +10,7 @@
     "url": "https://github.com/trueberryless-org/github-activity.git"
   },
   "license": "MIT",
-  "author": "trueberryless <trueberryless@gmail.com> (https://trueberryless.org)",
+  "author": "trueberryless <trueberryless@gmail.com> (https://felixs.dev)",
   "type": "module",
   "scripts": {
     "astro": "astro",
