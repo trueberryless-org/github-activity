@@ -1,19 +1,34 @@
 {
   "name": "recent-github-activity-monorepo",
-  "homepage": "https://github.com/trueberryless-org/recent-github-activity",
-  "bugs": {
-    "url": "https://github.com/trueberryless-org/recent-github-activity/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/trueberryless-org/recent-github-activity.git"
-  },
+  "version": "0.0.0",
+  "private": true,
   "license": "MIT",
   "author": "trueberryless <trueberryless@gmail.com> (https://felixs.dev)",
-  "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "6.0.2",
-    "prettier": "3.9.6",
-    "prettier-plugin-astro": "0.14.1"
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --filter recent-github-activity build",
+    "check": "pnpm --filter recent-github-activity astro sync && astro check --noSync",
+    "dev": "pnpm --filter recent-github-activity dev",
+    "format": "prettier . --write --cache --ignore-unknown",
+    "preview": "pnpm --filter recent-github-activity preview"
   },
-  "packageManager": "pnpm@11.1.2"
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+    "astro": "^7.3.5",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@11.28.0",
+  "homepage": "https://recent-github-activity.netlify.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trueberryless-org/recent-github-activity.git"
+  },
+  "bugs": "https://github.com/trueberryless-org/recent-github-activity/issues"
 }

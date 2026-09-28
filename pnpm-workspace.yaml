@@ -1,6 +1,5 @@
 packages:
   - "src/"
-  - "packages/**/*"
 
 allowBuilds:
   "@parcel/watcher": false
