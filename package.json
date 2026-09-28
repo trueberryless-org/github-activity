@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm --filter recent-github-activity build",
-    "check": "pnpm --filter recent-github-activity astro sync && astro check --noSync",
+    "check": "pnpm --filter recent-github-activity astro sync && astro check --noSync --root src",
     "dev": "pnpm --filter recent-github-activity dev",
     "format": "prettier . --write --cache --ignore-unknown",
     "preview": "pnpm --filter recent-github-activity preview"

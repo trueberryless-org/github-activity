@@ -60,12 +60,12 @@ export function getEventAppearance(event: GitHubEvent): EventAppearance {
       return { icon: "person-add", tone: "accent" };
     case "PublicEvent":
       return { icon: "globe", tone: "accent" };
-    case "PullRequestEvent":
-      if (event.payload.action === "merged")
-        return { icon: "merge", tone: "merged" };
-      if (event.payload.action === "closed")
-        return { icon: "pull-request", tone: "closed" };
+    case "PullRequestEvent": {
+      const action = getPullRequestAction(event.payload);
+      if (action === "merged") return { icon: "merge", tone: "merged" };
+      if (action === "closed") return { icon: "pull-request", tone: "closed" };
       return { icon: "pull-request", tone: "open" };
+    }
     case "PullRequestReviewEvent":
       if (event.payload.review.state === "approved")
         return { icon: "check", tone: "open" };
@@ -79,6 +79,13 @@ export function getEventAppearance(event: GitHubEvent): EventAppearance {
     case "WatchEvent":
       return { icon: "star", tone: "star" };
   }
+}
+
+export function getPullRequestAction({
+  action,
+  pull_request,
+}: PullRequestEventPayload) {
+  return action === "closed" && pull_request.merged ? "merged" : action;
 }
 
 export function getDisplayedEvents(events: GitHubEvent[]) {
@@ -127,6 +134,11 @@ export function formatAction(action: string) {
 export function getReviewVerb(state: string) {
   return REVIEW_VERBS.get(state) ?? "Reviewed";
 }
+
+type PullRequestEventPayload = Extract<
+  GitHubEvent,
+  { type: "PullRequestEvent" }
+>["payload"];
 
 export interface EventAppearance {
   icon: IconName;

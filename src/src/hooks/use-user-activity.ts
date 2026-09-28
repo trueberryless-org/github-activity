@@ -13,7 +13,11 @@ const INITIAL_STATE: ActivityState = {
 };
 
 export function useUserActivity(username: string) {
-  const [state, dispatch] = useReducer(activityReducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(
+    activityReducer,
+    username,
+    getInitialActivityState
+  );
   const controllerRef = useRef<AbortController | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -55,20 +59,10 @@ export function useUserActivity(username: string) {
   );
 
   useEffect(() => {
-    const cachedActivity = getCachedActivity(username);
-
-    if (cachedActivity) {
-      dispatch({
-        type: "loaded",
-        events: cachedActivity.events,
-        nextPage: cachedActivity.nextPage,
-      });
-    } else {
-      void loadPage(1);
-    }
+    if (stateRef.current.status === "loading") void loadPage(1);
 
     return () => controllerRef.current?.abort();
-  }, [username, loadPage]);
+  }, [loadPage]);
 
   const loadMore = useCallback(() => {
     const { nextPage, status } = stateRef.current;
@@ -84,6 +78,18 @@ export function useUserActivity(username: string) {
   }, [loadPage]);
 
   return { ...state, loadMore, retry };
+}
+
+function getInitialActivityState(username: string): ActivityState {
+  const cachedActivity = getCachedActivity(username);
+  if (!cachedActivity) return INITIAL_STATE;
+
+  return {
+    error: null,
+    events: cachedActivity.events,
+    nextPage: cachedActivity.nextPage,
+    status: "ready",
+  };
 }
 
 function activityReducer(

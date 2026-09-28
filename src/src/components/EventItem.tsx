@@ -7,6 +7,7 @@ import {
   formatExcerpt,
   formatShortSha,
   getEventAppearance,
+  getPullRequestAction,
   getPushUrl,
   getReviewVerb,
   stripRefPrefix,
@@ -175,12 +176,12 @@ function getEventContent(event: GitHubEvent): EventContent {
     case "PublicEvent":
       return { summary: <>Made the repository public</> };
     case "PullRequestEvent": {
-      const { action, number } = event.payload;
+      const { number } = event.payload;
 
       return {
         summary: (
           <>
-            {formatAction(action)} pull request{" "}
+            {formatAction(getPullRequestAction(event.payload))} pull request{" "}
             <Link href={getRepoUrl(repoName, "pull", number)}>#{number}</Link>
           </>
         ),

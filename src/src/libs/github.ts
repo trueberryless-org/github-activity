@@ -133,6 +133,7 @@ interface GitHubIssue {
 }
 
 interface GitHubPullRequestReference {
+  merged?: boolean;
   number: number;
 }
 
