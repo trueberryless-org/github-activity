@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-zinc-950 text-zinc-100 antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-400;
+  }
+
+  input:focus-visible {
+    @apply outline-offset-0;
+  }
+}
