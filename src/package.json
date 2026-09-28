@@ -1,13 +1,13 @@
 {
-  "name": "github-activity",
+  "name": "recent-github-activity",
   "version": "0.1.1",
   "homepage": "https://recent-github-activity.netlify.app/",
   "bugs": {
-    "url": "https://github.com/trueberryless-org/github-activity/issues"
+    "url": "https://github.com/trueberryless-org/recent-github-activity/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/trueberryless-org/github-activity.git"
+    "url": "https://github.com/trueberryless-org/recent-github-activity.git"
   },
   "license": "MIT",
   "author": "trueberryless <trueberryless@gmail.com> (https://felixs.dev)",
