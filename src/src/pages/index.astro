@@ -20,6 +20,24 @@ const description =
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <meta
+      name="description"
+      content="See what any GitHub user has been up to lately"
+    />
+    <meta property="og:title" content={title} />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:description"
+      content="See what any GitHub user has been up to lately"
+    />
+    <meta
+      property="og:image"
+      content="https://recent-github-activity.netlify.app/og.png"
+    />
+    <meta
+      property="og:image:alt"
+      content="What are you up to?"
+    />
   </head>
   <body>
     <div class="mx-auto flex min-h-dvh max-w-3xl flex-col px-4 sm:px-6">
