@@ -38,7 +38,7 @@ test("shows the activity of the default user", async ({ page }) => {
   await mockGitHub(page);
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Recent GitHub Activity");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("GitHub Activity");
   await expect(page.getByRole("heading", { level: 2 })).toHaveText("trueberryless");
   await expect(page.getByText("Starred the repository")).toBeVisible();
   await expect(page.getByText(/Pushed to/)).toBeVisible();
@@ -50,7 +50,7 @@ test("shows the user from the url", async ({ page }) => {
   await page.goto("/?user=octocat");
 
   await expect(page.getByRole("heading", { level: 2 })).toHaveText("octocat");
-  await expect(page).toHaveTitle("octocat · Recent GitHub Activity");
+  await expect(page).toHaveTitle("octocat · GitHub Activity");
 });
 
 test("searches for another user and picks a suggestion", async ({ page }) => {
@@ -85,10 +85,10 @@ test("has the canonical url and the standard Open Graph image", async ({ page })
   await mockGitHub(page);
   await page.goto("/");
 
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://recent-github-activity.netlify.app/");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://gh-activity.netlify.app/");
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
     "content",
-    "https://recent-github-activity.netlify.app/og-image.png",
+    "https://gh-activity.netlify.app/og-image.png",
   );
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", "/favicon.svg");
 });

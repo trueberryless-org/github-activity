@@ -1,11 +1,11 @@
-# Recent GitHub Activity
+# GitHub Activity
 
 [![Built with Astro](https://astro.badg.es/v2/built-with-astro/tiny.svg)](https://astro.build)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/2d07c3c7-e700-47d5-b450-1965b4c5c6d7/deploy-status)](https://app.netlify.com/sites/recent-github-activity/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/2d07c3c7-e700-47d5-b450-1965b4c5c6d7/deploy-status)](https://app.netlify.com/sites/gh-activity/deploys)
 
 Browse the recent public GitHub activity of any user: pushes, pull requests, issues, reviews, releases, stars and more.
 
-**[recent-github-activity.netlify.app](https://recent-github-activity.netlify.app)**
+**[gh-activity.netlify.app](https://gh-activity.netlify.app)**
 
 ## Features
 

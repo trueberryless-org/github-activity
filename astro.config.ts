@@ -4,7 +4,7 @@ import { defineConfig } from "astro/config";
 
 export default defineConfig({
   integrations: [react()],
-  site: "https://recent-github-activity.netlify.app",
+  site: "https://gh-activity.netlify.app",
   vite: {
     plugins: [tailwindcss()],
   },
