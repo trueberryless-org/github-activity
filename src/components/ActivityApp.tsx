@@ -8,7 +8,7 @@ import {
 import { ActivityFeed } from "./ActivityFeed";
 import { UserSearch } from "./UserSearch";
 
-const TITLE = "Recent GitHub Activity";
+const TITLE = "GitHub Activity";
 
 export function ActivityApp() {
   const [username, setUsername] = useState(() =>
