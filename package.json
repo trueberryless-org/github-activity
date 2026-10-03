@@ -41,7 +41,7 @@
     "prettier": "3.9.9",
     "prettier-plugin-astro": "1.1.0"
   },
-  "homepage": "https://recent-github-activity.netlify.app/",
+  "homepage": "https://gh-activity.netlify.app/",
   "bugs": {
     "url": "https://github.com/trueberryless-org/gh-activity/issues"
   },
