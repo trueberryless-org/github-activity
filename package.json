@@ -1,5 +1,5 @@
 {
-  "name": "recent-github-activity",
+  "name": "gh-activity",
   "private": true,
   "type": "module",
   "scripts": {
@@ -43,11 +43,11 @@
   },
   "homepage": "https://recent-github-activity.netlify.app/",
   "bugs": {
-    "url": "https://github.com/trueberryless-org/recent-github-activity/issues"
+    "url": "https://github.com/trueberryless-org/gh-activity/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/trueberryless-org/recent-github-activity.git"
+    "url": "https://github.com/trueberryless-org/gh-activity.git"
   },
   "license": "MIT",
   "author": "trueberryless <trueberryless@gmail.com> (https://felixs.dev)",

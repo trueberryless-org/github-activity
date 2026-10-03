@@ -26,7 +26,7 @@ export function setCachedActivity(
       JSON.stringify({ ...activity, timestamp: Date.now() })
     );
   } catch (error) {
-    console.warn("[recent-github-activity] Failed to cache activity.", error);
+    console.warn("[gh-activity] Failed to cache activity.", error);
   }
 }
 
