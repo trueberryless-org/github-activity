@@ -21,10 +21,18 @@ pnpm install
 pnpm dev
 ```
 
-Other scripts: `pnpm build`, `pnpm preview`, `pnpm check` (type checking) and `pnpm format`.
+| Command         | Action                                |
+| --------------- | ------------------------------------- |
+| `pnpm dev`      | Start the local development server    |
+| `pnpm build`    | Build the site to `./dist/`           |
+| `pnpm check`    | Type check the project                |
+| `pnpm lint`     | Lint with oxlint                      |
+| `pnpm knip`     | Find unused files and dependencies    |
+| `pnpm test`     | Run the unit tests                    |
+| `pnpm test:e2e` | Run the end-to-end tests (Playwright) |
 
 ## License
 
 Licensed under the MIT license, Copyright © trueberryless.
 
-See [LICENSE](https://github.com/trueberryless-org/recent-github-activity/blob/main/LICENSE) for more information.
+See [LICENSE](https://github.com/trueberryless-org/gh-activity/blob/main/LICENSE) for more information.

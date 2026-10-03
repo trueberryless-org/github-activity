@@ -1,7 +1,7 @@
 const GITHUB_API_URL = "https://api.github.com";
 const GITHUB_URL = "https://github.com";
 
-export const EVENTS_PER_PAGE = 30;
+const EVENTS_PER_PAGE = 30;
 const USER_SUGGESTIONS_COUNT = 5;
 
 const NEXT_LINK_RE = /<[^>]+>;\s*rel="next"/;

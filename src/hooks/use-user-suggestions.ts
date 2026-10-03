@@ -24,10 +24,7 @@ export function useUserSuggestions(query: string) {
       } catch (error) {
         if (isAbortError(error)) return;
 
-        console.warn(
-          "[recent-github-activity] Failed to search GitHub users.",
-          error
-        );
+        console.warn("[gh-activity] Failed to search GitHub users.", error);
         setSuggestions([]);
       }
     }, SEARCH_DEBOUNCE_MS);

@@ -1,3 +1,0 @@
-[build]
-command = "pnpm --filter recent-github-activity... run build"
-publish = "src/dist"
